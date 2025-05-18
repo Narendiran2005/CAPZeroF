@@ -20,14 +20,20 @@ const Navbar = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  useEffect(() => {
-    // Check login status from session storage
-    const loggedInStatus = sessionStorage.getItem("isLoggedIn") === "true";
-    const storedUserType = sessionStorage.getItem("userType") as "student" | "organization" | null;
-    
-    setIsLoggedIn(loggedInStatus);
-    setUserType(storedUserType);
-  }, []);
+useEffect(() => {
+  const syncSession = () => {
+    setIsLoggedIn(sessionStorage.getItem("isLoggedIn") === "true");
+    setUserType(sessionStorage.getItem("userType") as "student" | "organization" | null);
+  };
+
+  syncSession(); // On mount
+
+  window.addEventListener("sessionChange", syncSession);
+
+  return () => {
+    window.removeEventListener("sessionChange", syncSession);
+  };
+}, []);
 
   const handleLogout = () => {
     // Clear session storage
@@ -116,7 +122,7 @@ const Navbar = () => {
             ) : (
               <div className="flex space-x-2">
                 <Link to="/login">
-                  <Button variant="outline">Log in</Button>
+                  <Button variant="outline"> Log In</Button>
                 </Link>
                 <Link to="/signup">
                   <Button>Sign up</Button>

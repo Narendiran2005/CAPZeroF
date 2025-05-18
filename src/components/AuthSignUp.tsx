@@ -49,15 +49,15 @@ const AuthSignUp = () => {
       const response = await axios.post("http://localhost:5000/auth/register", userData);
       
       // Store auth token or user data
-      localStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("userData", JSON.stringify(response.data.user));
+      localStorage.setItem("isLoggedIn", "false");
+      
       
       toast({
-        title: "Account created successfully",
+        title: "Account created successfully Now Login to your account",
         description: "Welcome to CAD Arena!",
       });
       
-      navigate("/dashboard");
+      navigate("/");
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const errorMessage = error.response?.data?.message || "Failed to create account. Please try again.";

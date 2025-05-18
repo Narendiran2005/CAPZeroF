@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,14 +15,28 @@ import  NavbarUserSearch  from "@/components/NavbarUserSearch";
 const Dashboard = () => {
   const [accountType, setAccountType] = useState<"student" | "organization">("student");
 
-  const handleAccountToggle = () => {
-    const newType = accountType === "student" ? "organization" : "student";
-    setAccountType(newType);
-    toast({
-      title: "Account type switched",
-      description: `You are now viewing the dashboard as ${newType === "student" ? "a student" : "an organization"}.`,
-    });
+  //   const handleAccountToggle = () => {
+  //   const newType = accountType === "student" ? "organization" : "student";
+  //   setAccountType(newType);
+  //   toast({
+  //     title: "Account type switched",
+  //     description: `You are now viewing the dashboard as ${newType === "student" ? "a student" : "an organization"}.`,
+  //   });
+  // };
+
+ useEffect(() => {
+  const syncSession = () => {
+    setAccountType(sessionStorage.getItem("userType") as "student" | "organization" | null);
   };
+
+  syncSession(); // On mount
+
+  window.addEventListener("sessionChange", syncSession);
+
+  return () => {
+    window.removeEventListener("sessionChange", syncSession);
+  };
+}, []);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -42,11 +56,7 @@ const Dashboard = () => {
                     )}
                     {accountType === "student" ? "Student" : "Organization"} 
                   </span>
-                  <Switch
-                    checked={accountType === "organization"}
-                    onCheckedChange={handleAccountToggle}
-                    aria-label="Toggle account type"
-                  />
+                  
                 </div>
               </div>
               <div className="flex gap-2 w-full sm:w-auto justify-between">

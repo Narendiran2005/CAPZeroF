@@ -15,13 +15,13 @@ const AuthSignIn = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const login = async (email: string, password: string, userType: string) => {
+  const login = async (email: string, password: string, role: string,) => {
   const endpoint =
-    userType === "student"
+    role === "student"
       ? "http://localhost:5000/auth/login"
-      : "https://api.example.com/organization/login";
+      : "http://localhost:5000/auth/login";
 
-  const response = await axios.post(endpoint, { email, password });
+  const response = await axios.post(endpoint, { email, password, role });
   return response.data;
 };
 
@@ -31,10 +31,12 @@ const handleSubmit = async (e: React.FormEvent) => {
 
   try {
     const data = await login(email, password, userType);
-    localStorage.setItem("authToken", data.token);
-    localStorage.setItem("isLoggedIn", "true");
-    localStorage.setItem("userType", userType);
-    localStorage.setItem("userData", JSON.stringify(data.message));
+    sessionStorage.setItem("isLoggedIn", "true");
+    sessionStorage.setItem("userType", userType);
+    sessionStorage.setItem("userType", userType);
+    sessionStorage.setItem("userData", JSON.stringify(data.message));
+    sessionStorage.setItem("token", data.token);
+    window.dispatchEvent(new Event("sessionChange"));
 
     toast({
       title: "Logged in successfully",
