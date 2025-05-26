@@ -17,15 +17,13 @@ import UserSearchPage from "./pages/UserSearchPage";
 import CreateChallengePage from "./pages/CreateChallengePage";
 import UserProfilePage from "./pages/UserProfilePage";
 import LeaderboardPage from "./pages/Leaderboard";
-import ProtectedRoute from "./components/ProtectedRoute";
-import AuthRedirect from "./components/AuthRedirect";
+import ProtectedRoute from "./components/routes/ProtectedRoute";
+import AuthRedirect from "./components/routes/AuthRedirect";
 
 const queryClient = new QueryClient();
 
 const App = () => {
-  // Simple auth check to redirect logged in users to dashboard
-  // In a real app, this would use a proper auth context
-  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+  
   
   return (
     <QueryClientProvider client={queryClient}>

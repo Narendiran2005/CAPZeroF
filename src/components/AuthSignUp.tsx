@@ -59,8 +59,8 @@ const AuthSignUp = () => {
       
       navigate("/");
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        const errorMessage = error.response?.data?.message || "Failed to create account. Please try again.";
+      if (error.response.status === 400) {
+        const errorMessage = error.response?.data?.error || "Failed to create account. Please try again.";
         toast({
           title: "Signup failed",
           description: errorMessage,

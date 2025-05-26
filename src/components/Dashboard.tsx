@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,39 +14,19 @@ import UserProfileSidebar from "@/components/UserProfileSidebar";
 import UserStats from "@/components/UserStats";
 import ActivityCalendar from "@/components/ActivityCalendar";
 import RecentActivity from "@/components/RecentActivity";
-import axios from "axios";
 
 const Dashboard = () => {
   const [accountType, setAccountType] = useState<"student" | "organization">("student");
-  const [basicData, setBasicData]= useState(null)
+  
 
-  // const dashboardata =async() =>{
-
-  //   const data = await axios.get("http://localhost:5000/api/dash/basic");
-
-  // }
-
-  useEffect(() => {
-    const dashboardata =async() =>{
-      console.log("hi")
-      const token = sessionStorage.getItem("token");
-
-    const res = await axios.get("http://localhost:5000/api/dash/basic", {
-        headers: { Authorization: `Bearer ${token}` }});
-
-        setBasicData(res.data);
-        setAccountType(res.data.role)
-
-    
-
-    
-  }
-  console.log("hi2")
-  dashboardata()
-
-
-  }, []);
-
+  const handleAccountToggle = () => {
+    const newType = accountType === "student" ? "organization" : "student";
+    setAccountType(newType);
+    toast({
+      title: "Account type switched",
+      description: `You are now viewing the dashboard as ${newType === "student" ? "a student" : "an organization"}.`,
+    });
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -56,11 +36,23 @@ const Dashboard = () => {
           <div className="flex flex-col sm:flex-row justify-between items-center mb-8">
             <h1 className="text-3xl font-bold mb-4 sm:mb-0">Dashboard</h1>
             <div className="flex flex-col sm:flex-row gap-4 sm:items-center w-full sm:w-auto">
-              {/* <div className="flex items-center justify-between w-full sm:w-auto bg-white dark:bg-gray-800 rounded-lg px-4 py-2 border border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between w-full sm:w-auto bg-white dark:bg-gray-800 rounded-lg px-4 py-2 border border-gray-200 dark:border-gray-700">
                 <div className="flex items-center mr-4">
-                  
+                  <span className="text-sm font-medium mr-2">
+                    {accountType === "student" ? (
+                      <UserIcon className="h-4 w-4 inline mr-1" />
+                    ) : (
+                      <Building className="h-4 w-4 inline mr-1" />
+                    )}
+                    {accountType === "student" ? "Student" : "Organization"} 
+                  </span>
+                  <Switch
+                    checked={accountType === "organization"}
+                    onCheckedChange={handleAccountToggle}
+                    aria-label="Toggle account type"
+                  />
                 </div>
-              </div> */}
+              </div>
               <div className="flex gap-2 w-full sm:w-auto justify-between">
                 <Button variant="outline" asChild className="flex-1 sm:flex-none">
                   <Link to="/practice"><Code className="mr-2 h-4 w-4" /> Practice</Link>
@@ -89,20 +81,7 @@ const StudentDashboard = () => {
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       {/* Left Column - User Profile */}
       <div className="lg:col-span-1">
-        <UserProfileSidebar userData = {{
-    name: "Narendiran V B ",
-    gender: "Female",
-    location: "Kallakurichi",
-    birthday: undefined,
-    summary: "Hi I am a Newbie CAD Engineer",
-    website: "www.googole.com",
-    github: "www.github.com",
-    linkedin: "www.github.com",
-    twitter: "www.github.com",
-    workExperience: "5 yeats",
-    education: "B Tech",
-    skills: "CAD, ZOHO",
-        }} />
+        <UserProfileSidebar />
       </div>
       
       {/* Right Column - Stats and Activity */}
