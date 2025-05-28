@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -25,7 +24,7 @@ const App = () => {
   // Simple auth check to redirect logged in users to dashboard
   // In a real app, this would use a proper auth context
   const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
-  
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -33,7 +32,10 @@ const App = () => {
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={isLoggedIn ? <Navigate to="/dashboard" /> : <Index />} />
+            <Route
+              path="/"
+              element={isLoggedIn ? <Navigate to="/dashboard" /> : <Index />}
+            />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/dashboard" element={<Dashboard />} />
@@ -46,8 +48,15 @@ const App = () => {
             <Route path="/leaderboard" element={<LeaderboardPage />} />
             <Route path="/create-challenge" element={<CreateChallengePage />} />
             <Route path="/profile/:id" element={<UserProfilePage />} />
-            <Route path="/profile/:id/followers" element={<UserProfilePage />} />
-            <Route path="/profile/:id/following" element={<UserProfilePage />} />
+
+            <Route
+              path="/profile/:id/followers"
+              element={<UserProfilePage />}
+            />
+            <Route
+              path="/profile/:id/following"
+              element={<UserProfilePage />}
+            />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
