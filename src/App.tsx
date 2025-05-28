@@ -17,6 +17,8 @@ import UserSearchPage from "./pages/UserSearchPage";
 import CreateChallengePage from "./pages/CreateChallengePage";
 import UserProfilePage from "./pages/UserProfilePage";
 import LeaderboardPage from "./pages/Leaderboard";
+import ProtectedRoute from "./components/routes/ProtectedRoute";
+import AuthRedirect from "./components/routes/AuthRedirect";
 
 const queryClient = new QueryClient();
 
