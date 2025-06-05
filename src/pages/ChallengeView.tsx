@@ -56,13 +56,6 @@ interface Challenge {
 interface STLAnalysis {
   volume: number;
   surfaceArea: number;
-  centerOfMass: {
-    x: number;
-    y: number;
-    z: number;
-  };
-  triangleCount: number;
-  vertexCount: number;
 }
 
 // Mock data for a single challenge
