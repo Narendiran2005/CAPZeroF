@@ -17,7 +17,7 @@ import RecentActivity from "@/components/RecentActivity";
 import axios from "axios";
 
 const Dashboard = () => {
-  const [accountType, setAccountType] = useState<"student" | "organization">("student");
+  const [accountType, setAccountType] = useState<"student" | "organization">(null);
   const [basicData, setBasicData]= useState(null)
 
   // const dashboardata =async() =>{
@@ -31,17 +31,20 @@ const Dashboard = () => {
       console.log("hi")
       const token = sessionStorage.getItem("token");
 
-    const res = await axios.get("http://localhost:5000/api/dash/basic", {
+    const res = await axios.get("http://localhost:5000/api/dash/student/basic", {
         headers: { Authorization: `Bearer ${token}` }});
+        console.log("Student data", res.data)
+      console.log("Student data", res.data.user)
 
         setBasicData(res.data);
-        setAccountType(res.data.role)
+        setAccountType(res.data.user.role)
+      
 
     
 
     
   }
-  console.log("hi2")
+  
   dashboardata()
 
 
@@ -73,7 +76,7 @@ const Dashboard = () => {
           </div>
           
           {accountType === "student" ? (
-            <StudentDashboard />
+            <StudentDashboard basicData={basicData} />
           ) : (
             <OrganizationDashboard />
           )}
@@ -84,37 +87,63 @@ const Dashboard = () => {
   );
 };
 
-const StudentDashboard = () => {
+const StudentDashboard = ({ basicData }: { basicData: any }) => {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       {/* Left Column - User Profile */}
       <div className="lg:col-span-1">
-        <UserProfileSidebar userData = {{
-    name: "Narendiran V B ",
-    gender: "Female",
-    location: "Kallakurichi",
-    birthday: undefined,
-    summary: "Hi I am a Newbie CAD Engineer",
-    website: "www.googole.com",
-    github: "www.github.com",
-    linkedin: "www.github.com",
-    twitter: "www.github.com",
-    workExperience: "5 yeats",
-    education: "B Tech",
-    skills: "CAD, ZOHO",
-        }} />
+        {/* <UserProfileSidebar
+      userData={{
+        name: "Aravinth PM",
+        gender: "Male",
+        location: "Kallakurichi",
+        birthday: undefined,
+        summary: "Hi I am a Newbie CAD Engineer",
+        website: "www.googole.com",
+        github: "www.github.com",
+        linkedin: "www.github.com",
+        twitter: "www.github.com",
+        workExperience: "5 yeats",
+        education: "B Tech",
+        skills: "CAD, ZOHO",
+      }}
+    /> */}
+    <UserProfileSidebar  userData={basicData} />
+        {/* <div className="mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Account Type</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center space-x-4">
+                <span className="text-sm">Switch to:</span>
+                <Switch
+                  checked={basicData?.user?.role === "organization"}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      toast({
+                        title: "Switched to Organization Dashboard",
+                        description: "You can now manage challenges and participants.",
+                      });
+                    } else {
+                      toast({
+                        title: "Switched to Student Dashboard",
+                        description: "You can now view your profile and stats.",
+                      });
+                    }
+                  }}
+                />
+              </div>
+            </CardContent>
+          </Card>
+        </div> */}
       </div>
       
       {/* Right Column - Stats and Activity */}
       <div className="lg:col-span-2">
         <div className="space-y-6">
           {/* Stats */}
-          <UserStats 
-            completedChallenges={42}
-            totalPoints={1250}
-            currentStreak={7}
-            rank={124}
-          />
+          
           
           {/* Activity Calendar */}
           <ActivityCalendar />

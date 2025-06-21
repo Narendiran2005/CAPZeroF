@@ -50,6 +50,7 @@ const AuthSignUp = () => {
       
       // Store auth token or user data
       localStorage.setItem("isLoggedIn", "false");
+      console.log("user", response.data.insertId);
       
       
       toast({

@@ -18,20 +18,41 @@ import {
   Code
 } from "lucide-react";
 
+interface User_schema {
+  id: string;
+  username: string;
+  email: string;
+  
+  role: 'student' | 'organization' | 'admin';
+  avatar_url?: string | null;
+  is_verified: boolean;
+  is_active: boolean;
+  last_login?: string | null; // ISO format datetime
+  created_at: string;
+  updated_at: string;
+}
+
+interface Student_schema {
+  user_id: string;
+  full_name?: string | null;
+  bio?: string | null;
+  points: number;
+  streak: number;
+  level: number;
+  completed_challenges: number;
+  total_submissions: number;
+  last_active?: string | null; // ISO format datetime
+  location?: string | null;
+  website?: string | null;
+  github_url?: string | null;
+  linkedin_url?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 interface UserProfileData {
-  name: string;
-  gender?: string;
-  location?: string;
-  birthday?: Date;
-  summary?: string;
-  website?: string;
-  github?: string;
-  linkedin?: string;
-  twitter?: string;
-  workExperience?: string;
-  education?: string;
-  skills?: string;
-  profileImage?: string;
+  user: User_schema;
+  student: Student_schema;
 }
 
 // export default function UserProfileSidebar() {
@@ -184,10 +205,10 @@ export default function UserProfileSidebar({ userData }: UserProfileSidebarProps
       <CardContent className="p-6">
         <div className="flex flex-col items-center mb-6">
           <Avatar className="h-24 w-24 mb-4">
-            <AvatarImage src={userData.profileImage} alt={userData.name} />
-            <AvatarFallback className="text-xl">{getInitials(userData.name)}</AvatarFallback>
+            <AvatarImage src={userData.user.avatar_url|| "www.naren.com"} alt={userData.user.username} />
+            <AvatarFallback className="text-xl">{getInitials(userData.student.full_name)}</AvatarFallback>
           </Avatar>
-          <h2 className="text-xl font-bold">{userData.name}</h2>
+          <h2 className="text-xl font-bold">{userData.student.full_name}</h2>
           <Button variant="outline" size="sm" className="mt-2" asChild>
             <Link to="/profile/edit">
               <Pencil className="mr-2 h-4 w-4" />
@@ -197,47 +218,47 @@ export default function UserProfileSidebar({ userData }: UserProfileSidebarProps
         </div>
 
         <div className="space-y-6">
-          {userData.summary && (
+          {userData.student.bio && (
             <div className="mb-4">
               <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">About</h3>
-              <p className="text-sm">{userData.summary}</p>
+              <p className="text-sm">{userData.student.bio}</p>
             </div>
           )}
 
-          {formatProfileSection("Location", <MapPin className="h-4 w-4" />, userData.location)}
+          {formatProfileSection("Location", <MapPin className="h-4 w-4" />, userData.student.location)}
 
-          {userData.birthday && formatProfileSection(
+          {/* {userData.student.last_active && formatProfileSection(
             "Birthday",
             <Calendar className="h-4 w-4" />,
             new Date(userData.birthday).toLocaleDateString()
-          )}
+          )} */}
 
-          {formatProfileSection("Website", <Globe className="h-4 w-4" />, userData.website)}
-          {formatProfileSection("Github", <Github className="h-4 w-4" />, userData.github)}
-          {formatProfileSection("LinkedIn", <Linkedin className="h-4 w-4" />, userData.linkedin)}
-          {formatProfileSection("Twitter", <Twitter className="h-4 w-4" />, userData.twitter)}
+          {formatProfileSection("Website", <Globe className="h-4 w-4" />, userData.student.website)}
+          {formatProfileSection("Github", <Github className="h-4 w-4" />, userData.student.github_url)}
+          {formatProfileSection("LinkedIn", <Linkedin className="h-4 w-4" />, userData.student.linkedin_url)}
+          
 
-          {userData.workExperience && (
+          {userData.student.completed_challenges && (
             <div className="mb-4">
               <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-1 mb-1">
                 <Briefcase className="h-4 w-4" />
                 Work Experience
               </h3>
-              <p className="text-sm whitespace-pre-line">{userData.workExperience}</p>
+              <p className="text-sm whitespace-pre-line">{userData.student.completed_challenges}</p>
             </div>
           )}
 
-          {userData.education && (
+          {userData.student.bio && (
             <div className="mb-4">
               <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-1 mb-1">
                 <GraduationCap className="h-4 w-4" />
                 Education
               </h3>
-              <p className="text-sm whitespace-pre-line">{userData.education}</p>
+              <p className="text-sm whitespace-pre-line">{userData.student.bio}</p>
             </div>
           )}
 
-          {userData.skills && (
+          {/* {userData.skills && (
             <div className="mb-4">
               <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-1 mb-1">
                 <Code className="h-4 w-4" />
@@ -245,7 +266,7 @@ export default function UserProfileSidebar({ userData }: UserProfileSidebarProps
               </h3>
               <p className="text-sm whitespace-pre-line">{userData.skills}</p>
             </div>
-          )}
+          )} */}
         </div>
       </CardContent>
     </Card>
