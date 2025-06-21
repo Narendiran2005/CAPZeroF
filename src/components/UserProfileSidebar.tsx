@@ -272,4 +272,3 @@ export default function UserProfileSidebar({ userData }: UserProfileSidebarProps
     </Card>
   );
 }
-

@@ -34,6 +34,14 @@ useEffect(() => {
     window.removeEventListener("sessionChange", syncSession);
   };
 }, []);
+  useEffect(() => {
+    // Check login status from session storage
+    const loggedInStatus = sessionStorage.getItem("isLoggedIn") === "true";
+    const storedUserType = sessionStorage.getItem("userType") as "student" | "organization" | null;
+    
+    setIsLoggedIn(loggedInStatus);
+    setUserType(storedUserType);
+  }, []);
 
   const handleLogout = () => {
     // Clear session storage
