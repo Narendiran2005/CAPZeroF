@@ -20,59 +20,39 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useToast } from "@/hooks/use-toast";
-import { Clock } from "lucide-react";
-
-// Types
-enum ChallengeLevel {
-  BEGINNER = "Beginner",
-  INTERMEDIATE = "Intermediate",
-  ADVANCED = "Advanced",
-  EXPERT = "Expert",
-}
-
-enum ChallengeStatus {
-  DRAFT = "draft",
-  PUBLISHED = "published",
-  ARCHIVED = "archived",
-}
-
-interface Challenge {
-  id: string;
-  title: string;
-  description: string;
-  instructions: string;
-  level: ChallengeLevel;
-  points: number;
-  thumbnailUrl: string;
-  status: ChallengeStatus;
-  creatorId: string;
-  createdAt: Date;
-  updatedAt: Date;
-  submissionCount: number;
-  successRate: number;
-}
+import { useToast } from "@/components/ui/use-toast";
+import {
+  Challenge,
+  ChallengeLevel,
+  ChallengeStatus,
+  ChallengeType,
+  ChallengeVisibility,
+} from "@/utils/types";
+import { Clock, Users, Trophy, Download } from "lucide-react";
 
 interface STLAnalysis {
   volume: number;
   surfaceArea: number;
 }
-
-// Mock data for a single challenge
+// Mock challenge data
 const challengeData: Challenge = {
   id: "1",
   title: "Basic Gear Design",
   description:
     "Create a simple spur gear with specific tooth profile and dimensions.",
   instructions:
-    "Design a spur gear with 24 teeth, module 2mm, and pressure angle of 20°. The gear should have a hub with diameter 30mm and length 15mm. Include keyway with dimensions 6×6mm. Export your design as STL.",
+    "Design a spur gear with 24 teeth, module 2mm, and pressure angle of 20°. The gear should have a hub with diameter 30mm and length 15mm. Include keyway with dimensions 6×6mm. Export your design as both native CAD format and STL.",
   level: ChallengeLevel.BEGINNER,
+  type: ChallengeType.RACE_AGAINST_TIME,
+  visibility: ChallengeVisibility.PUBLIC,
   points: 100,
   thumbnailUrl: "/placeholder.svg",
   status: ChallengeStatus.PUBLISHED,
   creatorId: "org1",
   createdAt: new Date("2023-01-15"),
   updatedAt: new Date("2023-01-15"),
+  startDate: new Date("2023-01-15"),
+  endDate: new Date("2023-12-31"),
   submissionCount: 876,
   successRate: 87,
 };
@@ -120,6 +100,7 @@ const ChallengeView = () => {
   const [timerActive, setTimerActive] = useState(true);
 
   // State for file uploads
+
   const [stlFile, setStlFile] = useState<File | null>(null);
   const [stlAnalysis, setStlAnalysis] = useState<STLAnalysis | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -261,9 +242,7 @@ const ChallengeView = () => {
 
   const handleStlFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setStlFile(file);
-      parseSTLFile(file);
+      setStlFile(e.target.files[0]);
     }
   };
 
@@ -302,8 +281,8 @@ const ChallengeView = () => {
       challengeId: id,
       timeElapsed,
       answers,
-      stlFile: stlFile.name,
       stlAnalysis: stlAnalysis,
+      stlFile: stlFile.name,
     };
 
     // In a real app, would upload files and submit data to server
@@ -358,7 +337,7 @@ const ChallengeView = () => {
                 </Badge>
                 <Badge
                   variant="outline"
-                  className="bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900 dark:text-blue-300 dark:border-blue-800"
+                  className="bg-cadarena-50 text-cadarena-700 border-cadarena-200 dark:bg-cadarena-900 dark:text-cadarena-300 dark:border-cadarena-800"
                 >
                   {challengeData.points} points
                 </Badge>
@@ -419,6 +398,10 @@ const ChallengeView = () => {
                             Deliverables
                           </h3>
                           <ul className="list-disc pl-6 space-y-2">
+                            <li>
+                              CAD file in your preferred format (STEP, STP,
+                              etc.)
+                            </li>
                             <li>STL file for 3D printing validation</li>
                             <li>Complete the knowledge check questionnaire</li>
                           </ul>
@@ -574,48 +557,10 @@ const ChallengeView = () => {
                               variant="ghost"
                               size="sm"
                               className="mt-2"
-                              onClick={() => {
-                                setStlFile(null);
-                                setStlAnalysis(null);
-                              }}
+                              onClick={() => setStlFile(null)}
                             >
                               Remove
                             </Button>
-
-                            {/* STL Analysis Results */}
-                            {isAnalyzing && (
-                              <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900 rounded-lg">
-                                <p className="text-sm font-medium text-blue-700 dark:text-blue-300">
-                                  Analyzing STL file...
-                                </p>
-                              </div>
-                            )}
-
-                            {stlAnalysis && (
-                              <div className="mt-4 p-4 bg-green-50 dark:bg-green-900 rounded-lg text-left">
-                                <h4 className="font-medium text-green-800 dark:text-green-200 mb-3">
-                                  Analysis Results:
-                                </h4>
-                                <div className="space-y-2 text-sm">
-                                  <div className="flex justify-between">
-                                    <span className="text-green-700 dark:text-green-300">
-                                      Volume:
-                                    </span>
-                                    <span className="font-mono">
-                                      {stlAnalysis.volume.toFixed(2)} mm³
-                                    </span>
-                                  </div>
-                                  <div className="flex justify-between">
-                                    <span className="text-green-700 dark:text-green-300">
-                                      Surface Area:
-                                    </span>
-                                    <span className="font-mono">
-                                      {stlAnalysis.surfaceArea.toFixed(2)} mm²
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                            )}
                           </div>
                         ) : (
                           <div className="py-4">
@@ -627,7 +572,7 @@ const ChallengeView = () => {
                                 htmlFor="stl-file"
                                 className="cursor-pointer"
                               >
-                                <div className="bg-blue-600 text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-blue-700">
+                                <div className="bg-cadarena-600 text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-cadarena-700">
                                   Select File
                                 </div>
                                 <Input

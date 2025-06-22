@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
+import ProfileEdit from "./pages/ProfileEdit";
 import Practice from "./pages/Practice";
 import ChallengeView from "./pages/ChallengeView";
 import Competitions from "./pages/Competitions";
@@ -15,10 +16,13 @@ import Documentation from "./pages/Documentation";
 import NotFound from "./pages/NotFound";
 import UserSearchPage from "./pages/UserSearchPage";
 import CreateChallengePage from "./pages/CreateChallengePage";
-import UserProfilePage from "./pages/UserProfilePage";
-import LeaderboardPage from "./pages/Leaderboard";
 import ProtectedRoute from "./components/routes/ProtectedRoute";
 import AuthRedirect from "./components/routes/AuthRedirect";
+import ManagePracticePage from "./pages/ManagePracticePage";
+import ContestManagementPage from "./pages/ContestManagementPage";
+import ContestJoinPage from "./pages/ContestJoinPage";
+import UserProfilePage from "./pages/UserProfilePage";
+import LeaderboardPage from "./pages/Leaderboard";
 
 const queryClient = new QueryClient();
 
@@ -34,13 +38,33 @@ const App = () => {
         <Sonner />
         <BrowserRouter>
           <Routes>
+            <Route path="/" element={<Index />} />
+
             <Route
-              path="/"
-              element={isLoggedIn ? <Navigate to="/dashboard" /> : <Index />}
+              path="/login"
+              element={
+                <AuthRedirect>
+                  <Login />
+                </AuthRedirect>
+              }
             />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route
+              path="/signup"
+              element={
+                <AuthRedirect>
+                  <Signup />
+                </AuthRedirect>
+              }
+            />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            {/* <Route path="/dashboard" element={<Dashboard />} /> */}
             <Route path="/practice" element={<Practice />} />
             <Route path="/challenge/:id" element={<ChallengeView />} />
             <Route path="/competitions" element={<Competitions />} />
@@ -49,6 +73,15 @@ const App = () => {
             <Route path="/search" element={<UserSearchPage />} />
             <Route path="/leaderboard" element={<LeaderboardPage />} />
             <Route path="/create-challenge" element={<CreateChallengePage />} />
+            <Route path="/manage-practice" element={<ManagePracticePage />} />
+            <Route
+              path="/contest-management"
+              element={<ContestManagementPage />}
+            />
+            <Route
+              path="/contest/join/:challengeId"
+              element={<ContestJoinPage />}
+            />
             <Route path="/profile/:id" element={<UserProfilePage />} />
 
             <Route

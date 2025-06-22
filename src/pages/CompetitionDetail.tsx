@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Calendar, Trophy, Users, Clock, FileSymlink, Building, Award } from "lucide-react";
-import { Contest, Challenge, ChallengeLevel, ChallengeStatus } from "@/utils/types";
+import { Contest, Challenge, ChallengeLevel, ChallengeStatus, ChallengeVisibility } from "@/utils/types";
 import { useToast } from "@/components/ui/use-toast";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -21,45 +21,48 @@ const mockContests: Contest[] = [
     organizationId: "org1",
     startDate: new Date("2023-06-15"),
     endDate: new Date("2023-06-30"),
-    challenges: [
-      {
-        id: "101",
-        title: "Aerodynamic Spoiler Design",
-        description: "Design a spoiler that reduces drag while maintaining downforce.",
-        instructions: "Create a CAD model of a spoiler for a standard sedan that improves aerodynamics by at least 5%.",
-        level: ChallengeLevel.INTERMEDIATE,
-        points: 200,
-        thumbnailUrl: "/placeholder.svg",
-        status: ChallengeStatus.PUBLISHED,
-        creatorId: "org1",
-        createdAt: new Date("2023-05-20"),
-        updatedAt: new Date("2023-05-20"),
-        submissionCount: 45,
-        successRate: 62
-      },
-      {
-        id: "102",
-        title: "Lightweight Wheel Design",
-        description: "Design a wheel that reduces weight while maintaining structural integrity.",
-        instructions: "Create a CAD model of a wheel that is 20% lighter than standard wheels but maintains safety standards.",
-        level: ChallengeLevel.ADVANCED,
-        points: 300,
-        thumbnailUrl: "/placeholder.svg",
-        status: ChallengeStatus.PUBLISHED,
-        creatorId: "org1",
-        createdAt: new Date("2023-05-20"),
-        updatedAt: new Date("2023-05-20"),
-        submissionCount: 28,
-        successRate: 45
-      }
-    ],
+    challengeIds: ["101", "102"],
     registeredUsers: 156,
     status: "active",
     prizes: ["$2000 Cash Prize", "Internship Opportunity at Tesla Motors", "Feature in Automotive Design Magazine", "Industry Recognition"],
-    isPublic: true,
+    visibility: ChallengeVisibility.PUBLIC,
     registrationType: "open" as const,
   },
   // ... more mock contests would be here
+];
+
+// Mock challenges data for display
+const mockChallenges = [
+  {
+    id: "101",
+    title: "Aerodynamic Spoiler Design",
+    description: "Design a spoiler that reduces drag while maintaining downforce.",
+    instructions: "Create a CAD model of a spoiler for a standard sedan that improves aerodynamics by at least 5%.",
+    level: ChallengeLevel.INTERMEDIATE,
+    points: 200,
+    thumbnailUrl: "/placeholder.svg",
+    status: ChallengeStatus.PUBLISHED,
+    creatorId: "org1",
+    createdAt: new Date("2023-05-20"),
+    updatedAt: new Date("2023-05-20"),
+    submissionCount: 45,
+    successRate: 62
+  },
+  {
+    id: "102",
+    title: "Lightweight Wheel Design",
+    description: "Design a wheel that reduces weight while maintaining structural integrity.",
+    instructions: "Create a CAD model of a wheel that is 20% lighter than standard wheels but maintains safety standards.",
+    level: ChallengeLevel.ADVANCED,
+    points: 300,
+    thumbnailUrl: "/placeholder.svg",
+    status: ChallengeStatus.PUBLISHED,
+    creatorId: "org1",
+    createdAt: new Date("2023-05-20"),
+    updatedAt: new Date("2023-05-20"),
+    submissionCount: 28,
+    successRate: 45
+  }
 ];
 
 const CompetitionDetail = () => {
@@ -248,7 +251,7 @@ const CompetitionDetail = () => {
                 Competition Challenges
               </h2>
               
-              {contest.challenges.map((challenge) => (
+              {mockChallenges.map((challenge) => (
                 <Card key={challenge.id} className="overflow-hidden transition-all hover:shadow-md">
                   <CardContent className="p-6">
                     <div className="flex justify-between items-start mb-4">
