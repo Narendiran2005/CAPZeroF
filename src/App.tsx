@@ -27,8 +27,10 @@ import LeaderboardPage from "./pages/Leaderboard";
 const queryClient = new QueryClient();
 
 const App = () => {
-  
-  
+  // Simple auth check to redirect logged in users to dashboard
+  // In a real app, this would use a proper auth context
+  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -36,14 +38,33 @@ const App = () => {
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element = {<AuthRedirect><Index /></AuthRedirect>} />
+            <Route path="/" element={<Index />} />
 
-
-            <Route path="/login" element={<AuthRedirect><Login /></AuthRedirect>} />
-            <Route path="/signup" element={<AuthRedirect><Signup /></AuthRedirect>} />
-            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route
+              path="/login"
+              element={
+                <AuthRedirect>
+                  <Login />
+                </AuthRedirect>
+              }
+            />
+            <Route
+              path="/signup"
+              element={
+                <AuthRedirect>
+                  <Signup />
+                </AuthRedirect>
+              }
+            />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
             {/* <Route path="/dashboard" element={<Dashboard />} /> */}
-            <Route path="/profile/edit" element={<ProfileEdit />} />
             <Route path="/practice" element={<Practice />} />
             <Route path="/challenge/:id" element={<ChallengeView />} />
             <Route path="/competitions" element={<Competitions />} />
@@ -53,11 +74,24 @@ const App = () => {
             <Route path="/leaderboard" element={<LeaderboardPage />} />
             <Route path="/create-challenge" element={<CreateChallengePage />} />
             <Route path="/manage-practice" element={<ManagePracticePage />} />
-            <Route path="/contest-management" element={<ContestManagementPage />} />
-            <Route path="/contest/join/:challengeId" element={<ContestJoinPage />} />
+            <Route
+              path="/contest-management"
+              element={<ContestManagementPage />}
+            />
+            <Route
+              path="/contest/join/:challengeId"
+              element={<ContestJoinPage />}
+            />
             <Route path="/profile/:id" element={<UserProfilePage />} />
-            <Route path="/profile/:id/followers" element={<UserProfilePage />} />
-            <Route path="/profile/:id/following" element={<UserProfilePage />} />
+
+            <Route
+              path="/profile/:id/followers"
+              element={<UserProfilePage />}
+            />
+            <Route
+              path="/profile/:id/following"
+              element={<UserProfilePage />}
+            />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
