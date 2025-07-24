@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -34,11 +35,13 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Upload, FileText, Image, Wrench } from "lucide-react";
 import { ChallengeLevel } from "@/utils/types";
+import axios from "axios";
+// const navigate = useNavigate();
 
 const formSchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters"),
   description: z.string().optional(),
-  thumbnailImage: z.any().optional(),
+  thumbnailImage: z.instanceof(File).optional(),
   points: z.coerce.number().min(50, "Minimum 50 points").max(1000, "Maximum 1000 points"),
   difficulty: z.enum([
     ChallengeLevel.BEGINNER,
@@ -46,8 +49,8 @@ const formSchema = z.object({
     ChallengeLevel.ADVANCED,
     ChallengeLevel.EXPERT,
   ]),
-  technicalDiagram: z.any().optional(),
-  stlFile: z.any().optional(),
+  technicalDiagram: z.instanceof(File).optional(),
+  stlFile: z.instanceof(File).optional(),
   otherDetails: z.string().optional(),
 });
 
@@ -72,16 +75,24 @@ const CreatePracticeForm = () => {
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
     try {
-      console.log("Practice challenge data to submit:", data);
+      const formData = new FormData();
+      formData.append("title", data.title);
+      formData.append("description", data.description || "");
+      formData.append("points", data.points.toString()); 
+      formData.append("difficulty", data.difficulty);
+      formData.append("otherDetails", data.otherDetails || "");
+      formData.append("thumbnailImage", data.thumbnailImage as Blob);
+      formData.append("technicalDiagram", data.technicalDiagram as Blob);
+      formData.append("stlFile", data.stlFile as Blob);
+      const token = sessionStorage.getItem("token");
+      if (!token) {
+        
+        return;
+      }
+      const response = await axios.post(
+        "http://localhost:5000/api/practice/create", formData, {
+          headers: { Authorization: `Bearer ${token}` } })
       
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      toast({
-        title: "Practice challenge created",
-        description: "Your practice challenge has been successfully created.",
-      });
-      
-      form.reset();
     } catch (error) {
       console.error("Error creating practice challenge:", error);
       toast({
@@ -177,10 +188,33 @@ const CreatePracticeForm = () => {
                                 type="file"
                                 accept="image/*"
                                 className="sr-only"
-                                onChange={(e) => field.onChange(e.target.files?.[0])}
+                                onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+                if (file.size > MAX_FILE_SIZE) {
+                  toast({
+                    title: "File too large",
+                    description: "File size must be under 10MB.",
+                    variant: "destructive",
+                  });
+                  return;
+                }
+                field.onChange(file);
+              }
+            }}
                               />
+
                             </label>
                           </div>
+
+                          {field.value ? (
+        <p className="text-xs text-green-600 mt-2">
+          Selected File: <span className="font-medium">{field.value.name}</span>
+        </p>
+      ) : (
+        <p className="text-xs text-gray-500 mt-2">No file selected</p>
+      )}
                           <p className="text-xs text-gray-500 mt-1">PNG, JPG up to 10MB</p>
                         </div>
                       </FormControl>
@@ -273,10 +307,31 @@ const CreatePracticeForm = () => {
                                   type="file"
                                   accept="image/*,.pdf"
                                   className="sr-only"
-                                  onChange={(e) => field.onChange(e.target.files?.[0])}
+                                  onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+                if (file.size > MAX_FILE_SIZE) {
+                  toast({
+                    title: "File too large",
+                    description: "File size must be under 10MB.",
+                    variant: "destructive",
+                  });
+                  return;
+                }
+                field.onChange(file);
+              }
+            }}
                                 />
                               </label>
                             </div>
+                            {field.value ? (
+        <p className="text-xs text-green-600 mt-2">
+          Selected File: <span className="font-medium">{field.value.name}</span>
+        </p>
+      ) : (
+        <p className="text-xs text-gray-500 mt-2">No file selected</p>
+      )}
                             <p className="text-xs text-gray-500 mt-1">Image or PDF</p>
                           </div>
                         </FormControl>
@@ -305,10 +360,31 @@ const CreatePracticeForm = () => {
                                   type="file"
                                   accept=".stl"
                                   className="sr-only"
-                                  onChange={(e) => field.onChange(e.target.files?.[0])}
+                                  onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+                if (file.size > MAX_FILE_SIZE) {
+                  toast({
+                    title: "File too large",
+                    description: "File size must be under 10MB.",
+                    variant: "destructive",
+                  });
+                  return;
+                }
+                field.onChange(file);
+              }
+            }}
                                 />
                               </label>
                             </div>
+                            {field.value ? (
+        <p className="text-xs text-green-600 mt-2">
+          Selected File: <span className="font-medium">{field.value.name}</span>
+        </p>
+      ) : (
+        <p className="text-xs text-gray-500 mt-2">No file selected</p>
+      )}
                             <p className="text-xs text-gray-500 mt-1">STL format only</p>
                           </div>
                         </FormControl>

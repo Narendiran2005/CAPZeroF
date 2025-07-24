@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -17,8 +18,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Challenge, ChallengeLevel, ChallengeStatus, ChallengeVisibility, ChallengeType } from "@/utils/types";
 import { Clock } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import axios from "axios";
-import Practice from "./Practice";
+
 // Mock data for a single challenge
 const challengeData: Challenge = {
   id: "1",
@@ -43,18 +43,36 @@ const challengeData: Challenge = {
 // Mock data for quiz questions
 const quizQuestions = [
   {
-    id: "1",
-    question: "What is the volume",
+    id: "q1",
+    question: "What is the formula to calculate the pitch diameter of a spur gear?",
+    options: [
+      "Pitch Diameter = Number of teeth × Module",
+      "Pitch Diameter = Module / Number of teeth",
+      "Pitch Diameter = 2 × Module × Number of teeth",
+      "Pitch Diameter = Number of teeth / Module"
+    ],
     correctAnswer: 0
   },
   {
-    id: "2",
-    question: "what is the surface area ",
+    id: "q2",
+    question: "Which parameter directly affects the size of gear teeth?",
+    options: [
+      "Pressure angle",
+      "Module",
+      "Number of teeth",
+      "Hub diameter"
+    ],
     correctAnswer: 1
   },
   {
-    id: "3",
-    question: "What is mass if the density is 7.85 g/cm³?",
+    id: "q3",
+    question: "What is the purpose of the keyway in this design?",
+    options: [
+      "To reduce weight",
+      "To transmit torque between shaft and gear",
+      "To improve aesthetics",
+      "To reduce material usage"
+    ],
     correctAnswer: 1
   }
 ];
@@ -86,7 +104,6 @@ const ChallengeView = () => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-
   };
   
   // Start timer only when challengeStarted is true and not showing instructions
@@ -132,64 +149,38 @@ const ChallengeView = () => {
   
   const handleSubmit = () => {
     // Validate all required components are completed
-    // if (!stlFile) {
-    //   toast({
-    //     title: "Missing files",
-    //     description: "Please upload both CAD and STL files",
-    //     variant: "destructive"
-    //   });
-    //   return;
-    // }
+    if (!cadFile || !stlFile) {
+      toast({
+        title: "Missing files",
+        description: "Please upload both CAD and STL files",
+        variant: "destructive"
+      });
+      return;
+    }
     
-    // if (Object.keys(answers).length < quizQuestions.length) {
-    //   toast({
-    //     title: "Incomplete quiz",
-    //     description: "Please answer all quiz questions",
-    //     variant: "destructive"
-    //   });
-    //   return;
-    // }
+    if (Object.keys(answers).length < quizQuestions.length) {
+      toast({
+        title: "Incomplete quiz",
+        description: "Please answer all quiz questions",
+        variant: "destructive"
+      });
+      return;
+    }
     
     // Stop timer
     setTimerActive(false);
     
     // Create submission payload
     const submission = {
-      practiceId: id,
+      challengeId: id,
       timeElapsed,
       answers,
-      stlFile: stlFile as Blob
+      cadFile: cadFile.name,
+      stlFile: stlFile.name
     };
     
     // In a real app, would upload files and submit data to server
     console.log("Submitting:", submission);
-
-    try {
-      console.log(id)
-      
-      const formData = new FormData();
-formData.append("stlFile", stlFile);
-formData.append("practiceId", id);
-formData.append("timeElapsed", timeElapsed.toString());
-formData.append("answers", JSON.stringify(answers));
-formData.append("notes", ""); // collect from textarea if needed
- // assumed
-
-axios.post("http://localhost:5000/api/submission/upload-stl", formData, {
-  headers: {
-    Authorization: `Bearer ${localStorage.getItem("token")}`,
-    "Content-Type": "multipart/form-data"
-  }
-})
-
-
-
-    } catch (error) {
-      console.error("Error creating practice challenge:", error);
-      
-    }
-
-
     
     toast({
       title: "Challenge submitted!",
@@ -342,7 +333,7 @@ axios.post("http://localhost:5000/api/submission/upload-stl", formData, {
                   <AlertDialogHeader>
                     <AlertDialogTitle>Submit your solution?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      {(!stlFile) ? 
+                      {(!cadFile || !stlFile || Object.keys(answers).length < quizQuestions.length) ? 
                         "Your solution is incomplete. Please make sure you've uploaded all required files and answered all questions." :
                         "Your solution will be submitted for evaluation. Are you ready to submit?"}
                     </AlertDialogDescription>
@@ -351,7 +342,7 @@ axios.post("http://localhost:5000/api/submission/upload-stl", formData, {
                     <AlertDialogCancel onClick={() => setConfirmSubmit(false)}>Cancel</AlertDialogCancel>
                     <AlertDialogAction
                       onClick={handleSubmit}
-                      disabled={!stlFile}
+                      disabled={!cadFile || !stlFile || Object.keys(answers).length < quizQuestions.length}
                     >
                       Yes, Submit
                     </AlertDialogAction>
@@ -366,6 +357,7 @@ axios.post("http://localhost:5000/api/submission/upload-stl", formData, {
               <Tabs defaultValue="instructions" className="w-full">
                 <TabsList>
                   <TabsTrigger value="instructions">Instructions</TabsTrigger>
+                  {/* <TabsTrigger value="reference">Reference Materials</TabsTrigger> */}
                   <TabsTrigger value="quiz">Knowledge Check</TabsTrigger>
                 </TabsList>
                 
@@ -403,7 +395,66 @@ axios.post("http://localhost:5000/api/submission/upload-stl", formData, {
                       </ScrollArea>
                     </CardContent>
                   </Card>
-                </TabsContent>               
+                </TabsContent>
+                
+                {/* <TabsContent value="reference" className="mt-4">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Reference Materials</CardTitle>
+                      <CardDescription>
+                        Use these resources to help complete the challenge
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <ScrollArea className="h-[450px] pr-4">
+                        <div className="space-y-6">
+                          <div>
+                            <h3 className="font-semibold mb-2">Technical Drawing</h3>
+                            <div className="aspect-video bg-gray-200 dark:bg-gray-800 rounded-lg flex items-center justify-center mb-2">
+                              <img 
+                                src="/placeholder.svg" 
+                                alt="Technical drawing" 
+                                className="max-h-full object-contain"
+                              />
+                            </div>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                              Reference drawing with critical dimensions
+                            </p>
+                          </div>
+                          
+                          <div>
+                            <h3 className="font-semibold mb-2">Formula Reference</h3>
+                            <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
+                              <p className="font-mono">Pitch Diameter (d) = m × z</p>
+                              <p className="font-mono">Outside Diameter (da) = d + 2m</p>
+                              <p className="font-mono">Root Diameter (df) = d - 2.5m</p>
+                            </div>
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                              Where: m = module, z = number of teeth
+                            </p>
+                          </div>
+                          
+                          <div>
+                            <h3 className="font-semibold mb-2">Resources</h3>
+                            <ul className="space-y-2">
+                              <li>
+                                <a href="#" className="text-blue-600 dark:text-blue-400 hover:underline">
+                                  Gear Design Principles PDF
+                                </a>
+                              </li>
+                              <li>
+                                <a href="#" className="text-blue-600 dark:text-blue-400 hover:underline">
+                                  Video Tutorial: Creating Spur Gears
+                                </a>
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
+                      </ScrollArea>
+                    </CardContent>
+                  </Card>
+                </TabsContent> */}
+                
                 <TabsContent value="quiz" className="mt-4">
   <Card>
     <CardHeader>
@@ -430,6 +481,7 @@ axios.post("http://localhost:5000/api/submission/upload-stl", formData, {
   value={answers[question.id] || ""}
   onChange={(e) => {
     const val = e.target.value;
+
     // Allow only valid float or integer input
     if (/^(\d+(\.\d*)?|\.\d*)?$/.test(val)) {
       handleQuizAnswer(question.id, val);
@@ -455,7 +507,50 @@ axios.post("http://localhost:5000/api/submission/upload-stl", formData, {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-6">
-                   
+                    {/* <div>
+                      <h3 className="font-medium mb-2">Upload CAD File</h3>
+                      <div className="border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg p-4 text-center">
+                        {cadFile ? (
+                          <div>
+                            <p className="text-sm font-medium">{cadFile.name}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                              {(cadFile.size / 1024 / 1024).toFixed(2)} MB
+                            </p>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="mt-2" 
+                              onClick={() => setCadFile(null)}
+                            >
+                              Remove
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className="py-4">
+                            <p className="text-gray-500 dark:text-gray-400 mb-2">
+                              Upload your native CAD file
+                            </p>
+                            <div className="flex justify-center">
+                              <label htmlFor="cad-file" className="cursor-pointer">
+                                <div className="bg-cadarena-600 text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-cadarena-700">
+                                  Select File
+                                </div>
+                                <Input 
+                                  id="cad-file" 
+                                  type="file" 
+                                  className="hidden" 
+                                  accept=".stp,.step,.stl,.iges,.igs,.f3d,.dwg,.ipt,.sldprt"
+                                  onChange={handleCadFileChange}
+                                />
+                              </label>
+                            </div>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                              Accepted formats: STEP, STP, F3D, SLDPRT, etc.
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div> */}
                     
                     <div>
                       <h3 className="font-medium mb-2">Upload STL File</h3>

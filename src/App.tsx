@@ -23,6 +23,8 @@ import ContestManagementPage from "./pages/ContestManagementPage";
 import ContestJoinPage from "./pages/ContestJoinPage";
 import UserProfilePage from "./pages/UserProfilePage";
 import LeaderboardPage from "./pages/Leaderboard";
+import STLViewer from "./components/STLParser";
+import ChallengeResult from "./pages/ChallangeResult";
 
 const queryClient = new QueryClient();
 
@@ -58,6 +60,10 @@ const App = () => {
             <Route path="/profile/:id" element={<UserProfilePage />} />
             <Route path="/profile/:id/followers" element={<UserProfilePage />} />
             <Route path="/profile/:id/following" element={<UserProfilePage />} />
+             <Route path="/challenge-results" element={<ChallengeResult />} />
+            <Route path="/stl-viewer" element={<STLViewer stlUrl="https://example.com/model.stl" title="3D Model Viewer" />} />
+            
+            {/* Redirects */}
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

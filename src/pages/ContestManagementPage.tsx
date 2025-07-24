@@ -6,34 +6,11 @@ import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { 
-  Trophy, 
-  Users, 
-  Calendar, 
-  MoreHorizontal, 
-  Eye, 
-  Edit, 
-  Trash2, 
-  Link,
-  Copy,
-  UserPlus
-} from "lucide-react";
+import {Table,TableBody,TableCell, TableHead,TableHeader,TableRow} from "@/components/ui/table";
+import {DropdownMenu,DropdownMenuContent,DropdownMenuItem,DropdownMenuTrigger,} from "@/components/ui/dropdown-menu";
+import { Trophy, Users, Calendar, MoreHorizontal, Eye, Edit, Trash2, Link,Copy,UserPlus} from "lucide-react";
 import { format } from "date-fns";
-
+// Need to add api for manage contests
 interface Contest {
   id: string;
   title: string;

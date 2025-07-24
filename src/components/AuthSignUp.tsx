@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/components/ui/use-toast";
 import { UserRole } from "@/utils/types";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const AuthSignUp = () => {
   const [email, setEmail] = useState("");
@@ -16,6 +17,8 @@ const AuthSignUp = () => {
   const [username, setUsername] = useState("");
   const [userRole, setUserRole] = useState<UserRole>(UserRole.STUDENT);
   const [organizationName, setOrganizationName] = useState("");
+  const [gender, setGender] = useState("");
+  const [fullname, setFullname] = useState("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -42,6 +45,8 @@ const AuthSignUp = () => {
       username,
       role: userRole,
       ...(userRole === UserRole.ORGANIZATION && { organizationName }),
+      ...(userRole === UserRole.STUDENT && { gender }),
+      ...(userRole === UserRole.STUDENT && { fullname }),
     };
 
     try {
@@ -156,6 +161,7 @@ const AuthSignUp = () => {
                 Student / Individual
               </Label>
             </div>
+            
             <div className="flex items-center space-x-2">
               <RadioGroupItem
                 value={UserRole.ORGANIZATION}
@@ -168,6 +174,35 @@ const AuthSignUp = () => {
             </div>
           </RadioGroup>
         </div>
+        {userRole === UserRole.STUDENT && (
+          <div className="space-y-6 mb-6">
+          <div className="mb-6">
+            <Label htmlFor="fullname">Full name</Label>
+            <Input
+              id="fullname"
+              type="text"
+              value={fullname}
+              onChange={(e) => setFullname(e.target.value)}
+              placeholder="name"
+              required={userRole === UserRole.STUDENT}
+            />
+          </div>
+          
+
+          <div className="flex flex-col space-y-1">
+  <Label>Gender</Label>
+  <Select value={gender} onValueChange={setGender}>
+    <SelectTrigger className="w-[180px]">
+      <SelectValue placeholder="Select Gender" />
+    </SelectTrigger>
+    <SelectContent>
+      <SelectItem value="male">Male</SelectItem>
+      <SelectItem value="female">Female</SelectItem>
+    </SelectContent>
+  </Select>
+</div>
+</div>
+            )}
 
         {userRole === UserRole.ORGANIZATION && (
           <div className="mb-6">

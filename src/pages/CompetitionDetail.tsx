@@ -73,24 +73,33 @@ const CompetitionDetail = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const axios = require('axios'); // Assuming axios is used for API calls
 
   useEffect(() => {
-    // Simulate API call to get contest details
-    setLoading(true);
-    
+    // API call to fetch contest details
+    const fetchContest = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/api/challenge/${id}`);
+        setContest(response.data);
+      } catch (error) {
+        console.error("Error fetching contest:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchContest();
+
     // Check login status
     const loggedInStatus = sessionStorage.getItem("isLoggedIn") === "true";
     setIsLoggedIn(loggedInStatus);
 
     // Find the contest with the matching ID
     const foundContest = mockContests.find(c => c.id === id);
+
+   
     
-    setTimeout(() => {
-      if (foundContest) {
-        setContest(foundContest);
-      }
-      setLoading(false);
-    }, 1000);
+    
   }, [id]);
 
   const handleRegister = () => {

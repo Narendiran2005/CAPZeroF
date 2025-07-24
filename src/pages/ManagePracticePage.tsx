@@ -1,34 +1,23 @@
 
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CreatePracticeForm from "@/components/CreatePracticeForm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import {Table,TableBody,TableCell,TableHead,TableHeader,TableRow} from "@/components/ui/table";
+import {Dialog,DialogContent,DialogDescription,DialogHeader,DialogTitle,DialogTrigger} from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Wrench, Users, Eye, Edit, Trash2, Clock, Target, Calendar, User, Award } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@/hooks/use-toast"
+import axios from "axios";
 
 const ManagePracticePage = () => {
-  const [practices, setPractices] = useState([
-    {
+  const [practices, setPractices] = useState([]);
+
+  const pdata = [{
       id: 1,
       title: "Mechanical Gear Design",
       difficulty: "Intermediate",
@@ -63,8 +52,9 @@ const ManagePracticePage = () => {
       completions: 45,
       avgTime: "28 min",
       avgAccuracy: "85%"
-    }
-  ]);
+    }]
+
+  
 
   const [participantData] = useState([
     {
@@ -79,7 +69,7 @@ const ManagePracticePage = () => {
     },
     {
       id: 2,
-      practiceId: 1,
+      practiceId: 2,
       userName: "Sarah Johnson",
       completedAt: "2024-01-19 16:15",
       timeSpent: "38 min",
@@ -99,7 +89,34 @@ const ManagePracticePage = () => {
     }
   ]);
 
-  const [selectedPractice, setSelectedPractice] = useState(null);
+  useEffect(() => {
+    
+    const fetchPractices = async () => {
+      try {
+        // Replace with your API endpoint
+        const token = sessionStorage.getItem("token");
+         const response = await axios.get("http://localhost:5000/api/practice/managepractice", {
+           headers: {
+             Authorization: `Bearer ${token}`
+           }
+         });
+        setPractices(response.data || pdata); // Use response data or fallback to sample data
+      } catch (error) {
+        console.error("Error fetching practices:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load practices. Please try again later.",
+          variant: "destructive",
+        });
+      }
+      
+    };
+    fetchPractices();
+  }, []);
+
+
+
+  const [selectedPractice, setSelectedPractice] = useState([]);
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty.toLowerCase()) {
@@ -120,7 +137,7 @@ const ManagePracticePage = () => {
     switch (status.toLowerCase()) {
       case "active":
         return "bg-green-100 text-green-800";
-      case "draft":
+      case "upcoming": //draft
         return "bg-gray-100 text-gray-800";
       case "archived":
         return "bg-red-100 text-red-800";
@@ -129,8 +146,21 @@ const ManagePracticePage = () => {
     }
   };
 
+ 
+const getParticipantsForPractice = async(practiceId) => {
+    try {
+       // const response = await axios.get(`http://localhost:5000/api/practice/${practiceId}/participants`);
+        setSelectedPractice(participantData.filter(p => p.practiceId === practiceId));
+
+        return null;
+    } catch (error) {
+        console.error("Error fetching participants:", error);
+        return null;
+    }
+};
+
   const handleViewParticipants = (practice) => {
-    setSelectedPractice(practice);
+    const participants = getParticipantsForPractice(practice.id);
   };
 
   const handleEditPractice = (practice) => {
@@ -149,9 +179,9 @@ const ManagePracticePage = () => {
     });
   };
 
-  const getParticipantsForPractice = (practiceId) => {
-    return participantData.filter(p => p.practiceId === practiceId);
-  };
+  // const getParticipantsForPractice = (practiceId) => {
+  //   return participantData.filter(p => p.practiceId === practiceId);
+  // };
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -165,7 +195,7 @@ const ManagePracticePage = () => {
             </p>
           </div>
 
-          <Tabs defaultValue="create" className="space-y-6">
+          <Tabs defaultValue="manage" className="space-y-6">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="create" className="flex items-center gap-2">
                 <Wrench className="h-4 w-4" />
@@ -178,7 +208,7 @@ const ManagePracticePage = () => {
             </TabsList>
 
             <TabsContent value="create">
-              <CreatePracticeForm />
+               <CreatePracticeForm /> 
             </TabsContent>
 
             <TabsContent value="manage">
@@ -216,17 +246,17 @@ const ManagePracticePage = () => {
                             </TableCell>
                             <TableCell>{practice.points}</TableCell>
                             <TableCell>{practice.participants}</TableCell>
-                            <TableCell>{practice.completions}</TableCell>
+                            <TableCell>{practice?.completions || 0}</TableCell>
                             <TableCell>
                               <div className="flex items-center gap-1">
                                 <Clock className="h-3 w-3" />
-                                {practice.avgTime}
+                                {practice.average_time}
                               </div>
                             </TableCell>
                             <TableCell>
                               <div className="flex items-center gap-1">
                                 <Target className="h-3 w-3" />
-                                {practice.avgAccuracy}
+                                {practice.average_accuracy}
                               </div>
                             </TableCell>
                             <TableCell>
@@ -237,7 +267,7 @@ const ManagePracticePage = () => {
                             <TableCell>
                               <div className="flex items-center gap-1">
                                 <Calendar className="h-3 w-3" />
-                                {practice.createdAt}
+                                {practice.created_at}
                               </div>
                             </TableCell>
                             <TableCell className="text-right">
@@ -280,7 +310,9 @@ const ManagePracticePage = () => {
                                               <div>
                                                 <p className="text-sm font-medium">Completion Rate</p>
                                                 <p className="text-2xl font-bold">
-                                                  {Math.round((practice.completions / practice.participants) * 100)}%
+                                                  {practice?.participants > 0
+  ? `${Math.round((practice.completions / practice.participants) * 100)}%`
+  : '0%'}
                                                 </p>
                                               </div>
                                             </div>
@@ -292,7 +324,7 @@ const ManagePracticePage = () => {
                                               <Target className="h-4 w-4 text-orange-600" />
                                               <div>
                                                 <p className="text-sm font-medium">Avg Accuracy</p>
-                                                <p className="text-2xl font-bold">{practice.avgAccuracy}</p>
+                                                <p className="text-2xl font-bold">{practice.average_accuracy}</p>
                                               </div>
                                             </div>
                                           </CardContent>
@@ -311,7 +343,7 @@ const ManagePracticePage = () => {
                                           </TableRow>
                                         </TableHeader>
                                         <TableBody>
-                                          {getParticipantsForPractice(practice.id).map((participant) => (
+                                          {selectedPractice.map((participant) => (
                                             <TableRow key={participant.id}>
                                               <TableCell>
                                                 <div className="flex items-center gap-2">
